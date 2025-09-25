@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Science & Technology Quiz — Setup</title>
+<style>
+:root{
+  --bg:#eaf2ff; --panel:#fff; --ink:#0f172a; --muted:#6b7280;
+  --accent:#3b82f6; --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+}
+.wrap{max-width:980px;margin:18px auto;padding:0 14px}
+
+/* Header */
+.header{text-align:center;margin:0 0 10px}
+.header h1{font-size:22px;letter-spacing:.4px;margin:0 0 2px}
+.header h2{font-size:28px;margin:0 0 4px}
+.header p{margin:0;color:var(--muted)}
+
+/* Panel */
+.panel{
+  background:var(--panel); border-radius:var(--radius);
+  box-shadow:0 8px 24px rgba(15,23,42,.06);
+  padding:14px 14px 10px; max-width:820px; margin:0 auto;
+}
+
+/* Controls */
+.controls-row{
+  display:flex; align-items:end; justify-content:space-between;
+  gap:10px; flex-wrap:wrap;
+}
+.label{font-size:12px;color:var(--muted);display:block;margin:0 0 4px}
+select,input[type="text"],input[type="number"]{
+  padding:9px 11px; border:1px solid #d1d5db; border-radius:12px;
+  font-size:14.5px; background:#fff;
+}
+input[type="number"]{text-align:right}
+.btns{display:flex;gap:8px}
+button{
+  padding:9px 14px; border:0; border-radius:12px;
+  font-weight:700; cursor:pointer; font-size:14px;
+}
+button.primary{background:var(--accent);color:#fff}
+button.ghost{background:#ebeef3;color:#111827}
+
+/* Grid for name + score */
+.grid{
+  display:grid; grid-template-columns:1fr 120px;
+  gap:12px 16px; margin-top:14px; align-items:center;
+}
+.row-mini-label{font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px}
+input[type="text"],input[type="number"]{width:100%}
+
+
+/* Logos */
+.logos{
+  margin-top:20px; text-align:center;
+}
+.logo-img{
+  max-height:120px;
+  margin:10px 20px;
+}
+
+/* Phones */
+@media (max-width:560px){
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Header -->
+    <header class="header">
+      <h1>SCIENCE AND TECHNOLOGY</h1>
+      <h2>QUIZ COMPETITION 2025</h2>
+      <p>Civil and Environmental Engineering Society</p>
+      <p>University of Jaffna</p>
+    </header>
+
+    <!-- Panel -->
+    <section class="panel">
+      <div class="controls-row">
+        <label>
+          <span class="label">Number of schools</span>
+          <select id="numSelect">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5" selected>5</option>
+          </select>
+        </label>
+        <div class="btns">
+          <button id="btnDisplay" class="primary">Display Results</button>
+          <button id="btnClear" class="ghost">Clear All</button>
+        </div>
+      </div>
+
+      <div id="rows" class="grid"></div>
+    </section>
+
+    <!-- Logos below -->
+    <div class="logos">
+      <img src="img1.png" alt="Logo 1" class="logo-img">
+      <img src="img2.png" alt="Logo 2" class="logo-img">
+    </div>
+    
+  </div>
+
+<script>
+const LS_KEY='podium_v1';
+const rowsEl=document.getElementById('rows');
+const numSelect=document.getElementById('numSelect');
+const btnDisplay=document.getElementById('btnDisplay');
+const btnClear=document.getElementById('btnClear');
+
+function defaultRows(n){
+  const a=[]; for(let i=0;i<n;i++) a.push({name:`School ${i+1}`,score:0});
+  return a;
+}
+function loadState(n){
+  try{
+    const raw=localStorage.getItem(LS_KEY); if(!raw) return defaultRows(n);
+    const data=JSON.parse(raw); if(!Array.isArray(data)) return defaultRows(n);
+    if(data.length===n) return data;
+    if(data.length>n) return data.slice(0,n);
+    return [...data,...defaultRows(n-data.length)];
+  }catch{ return defaultRows(n); }
+}
+function saveState(list){
+  localStorage.setItem(LS_KEY, JSON.stringify(list));
+}
+function renderRows(list){
+  rowsEl.innerHTML='';
+  list.forEach((row,i)=>{
+    const name=`name_${i}`,score=`score_${i}`;
+    const d1=document.createElement('div');
+    d1.innerHTML=`<div class="row-mini-label">School ${i+1}</div>
+      <input type="text" id="${name}" value="${row.name.replace(/"/g,'&quot;')}" />`;
+    const d2=document.createElement('div');
+    d2.innerHTML=`<div class="row-mini-label">Score</div>
+      <input type="number" id="${score}" min="0" step="1" value="${Number(row.score)||0}" />`;
+    rowsEl.appendChild(d1); rowsEl.appendChild(d2);
+  });
+}
+function readRows(){
+  const n=parseInt(numSelect.value,10); const out=[];
+  for(let i=0;i<n;i++){
+    const nm=(document.getElementById(`name_${i}`).value||'').trim()||`School ${i+1}`;
+    const sc=parseInt(document.getElementById(`score_${i}`).value,10);
+    out.push({name:nm,score:isNaN(sc)?0:sc});
+  }
+  return out;
+}
+
+(function init(){
+  numSelect.addEventListener('change',()=>{
+    const n=Math.max(2,Math.min(5,parseInt(numSelect.value,10)||5));
+    numSelect.value=String(n);
+    const list=loadState(n); renderRows(list); saveState(list);
+  });
+
+  btnClear.addEventListener('click',()=>{
+    const n=parseInt(numSelect.value,10);
+    const list=defaultRows(n); renderRows(list); saveState(list);
+  });
+
+  btnDisplay.addEventListener('click',()=>{
+    const list=readRows();
+    if(list.length<2||list.length>5){
+      alert('Please choose 2 to 5 schools.');
+      return;
+    }
+    saveState(list);
+    // Pass via URL hash so it works on file:// too
+    const payload=encodeURIComponent(btoa(JSON.stringify(list)));
+    window.location.href='results.html#'+payload;
+  });
+
+  rowsEl.addEventListener('input',e=>{
+    if(e.target.matches('input')) saveState(readRows());
+  });
+
+  renderRows(loadState(parseInt(numSelect.value,10)));
+})();
+</script>
+</body>
+</html>

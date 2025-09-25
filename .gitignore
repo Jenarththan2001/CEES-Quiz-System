@@ -1,0 +1,21 @@
+﻿# VS / .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archives & builds (we use Releases or LFS)
+*.zip
+*.7z
+*.rar
+*.msi
+*.exe
+
+# Node/JS (if you later add tooling)
+node_modules/
+dist/

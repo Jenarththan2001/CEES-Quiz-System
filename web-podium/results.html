@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Science & Technology Quiz — Results</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#eaf2ff;--panel:#fff;--ink:#0f172a;--muted:#6b7280;--accent:#3b82f6;--radius:14px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:980px;margin:18px auto;padding:0 14px}
+
+/* Title block */
+.header{margin-bottom:6px}
+.header .titles{text-align:center}
+.header h1{font-size:22px;margin:0 0 2px}
+.header h2{font-size:28px;margin:0 0 2px}
+.header p{margin:0;color:var(--muted)}
+
+/* Buttons */
+.btns{display:flex;gap:8px}
+button{padding:9px 14px;border:0;border-radius:12px;font-weight:700;cursor:pointer;font-size:14px}
+button.primary{background:var(--accent);color:#fff}
+button.ghost{background:#ebeef3;color:#111827}
+/* Right-aligned row under the title, above chart */
+.btns-below{justify-content:flex-end;margin:10px 0 12px}
+
+/* Cards */
+.panel{background:var(--panel);border-radius:var(--radius);
+  box-shadow:0 8px 24px rgba(15,23,42,.06);padding:12px;max-width:980px;margin:0 auto 10px}
+.chart-card{height:240px;padding:8px 12px}
+#chart{max-height:220px}
+
+/* Table */
+.table{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:4px}
+.table th,.table td{padding:6px 10px;border-bottom:1px solid #eef2f7}
+.table th{background:#f6f8fc;text-align:left}
+.table .num{text-align:right}
+.empty-msg{color:#6b7280;text-align:center;padding:20px;font-size:15px}
+
+/* Logos */
+.logos {
+  margin-top: 20px;
+  text-align: center;   /* Center align */
+}
+.logo-img {
+  max-height: 120px;    /* Scale images */
+  margin: 10px 20px;    /* Space between */
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Title block -->
+    <header class="header">
+      <div class="titles">
+        <h1>SCIENCE AND TECHNOLOGY</h1>
+        <h2>QUIZ COMPETITION 2025</h2>
+        <p>Civil and Environmental Engineering Society</p>
+        <p>University of Jaffna</p>
+      </div>
+    </header>
+
+    <!-- Buttons -->
+    <div class="btns btns-below">
+      <button id="btnFullscreen" class="primary">Fullscreen</button>
+      <button id="btnBack" class="ghost">Back to Setup</button>
+    </div>
+
+    <!-- Chart -->
+    <section class="panel chart-card">
+      <canvas id="chart"></canvas>
+    </section>
+
+    <!-- Table -->
+    <section class="panel">
+      <table class="table" id="resultsTable">
+        <thead>
+          <tr><th style="width:52px">#</th><th>School</th><th class="num" style="width:120px">Score</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Logos below the table -->
+    <div class="logos">
+      <img src="img1.png" alt="Logo 1" class="logo-img">
+      <img src="img2.png" alt="Logo 2" class="logo-img">
+    </div>
+  </div>
+
+<script>
+const LS_KEY='podium_v1';
+
+/* Read from URL hash first (works with file://), then localStorage */
+function readFromHash(){
+  if(!location.hash) return null;
+  try{
+    const json = atob(decodeURIComponent(location.hash.slice(1)));
+    const arr = JSON.parse(json);
+    return Array.isArray(arr) ? arr : null;
+  }catch{ return null; }
+}
+function readFromLocalStorage(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    return JSON.parse(raw || '[]');
+  }catch{ return []; }
+}
+
+let data = (readFromHash() ?? readFromLocalStorage())
+  .filter(x => x && x.name && Number.isFinite(+x.score))
+  .map(x => ({ name: String(x.name), score: Math.max(0, parseInt(x.score,10) || 0) }))
+  .sort((a,b)=>b.score-a.score);
+
+/* Table */
+const tbody=document.querySelector('#resultsTable tbody');
+if (data.length === 0) {
+  tbody.innerHTML = `<tr><td colspan="3" class="empty-msg">No results found. Please go back and enter scores.</td></tr>`;
+} else {
+  tbody.innerHTML = data.map((r,i)=>
+    `<tr><td>${i+1}</td><td>${r.name}</td><td class="num">${r.score}</td></tr>`
+  ).join('');
+}
+
+/* Chart */
+if (data.length > 0) {
+  const ctx=document.getElementById('chart');
+  const colors=['#f59e0b','#9ca3af','#b45309','#3b82f6','#10b981'];
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:data.map(d=>d.name),
+      datasets:[{label:'Score',data:data.map(d=>d.score),backgroundColor:colors.slice(0,data.length)}]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{enabled:true}},
+      scales:{x:{ticks:{color:'#111827'}},y:{beginAtZero:true,ticks:{stepSize:5}}}
+    }
+  });
+}
+
+/* Actions */
+document.getElementById('btnBack').onclick=()=>location.href='index.html';
+document.getElementById('btnFullscreen').onclick=()=>{
+  const root=document.documentElement;
+  if(!document.fullscreenElement){ root.requestFullscreen().catch(()=>{}); }
+  else{ document.exitFullscreen(); }
+};
+</script>
+</body>
+</html>
