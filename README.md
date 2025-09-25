@@ -1,8 +1,10 @@
 # CEES Quiz System 🎉
 
 **SCIENCE AND TECHNOLOGY – QUIZ COMPETITION 2025**
-*Civil and Environmental Engineering Society, University of Jaffna*
 
+<div align="center">
+  <b>*Civil and Environmental Engineering Society, University of Jaffna*</b>
+</div>
 A complete buzzer + scoring solution:
 
 * ⚡ **Arduino Mega** hardware that captures button presses, locks the first team, and controls team LEDs.
