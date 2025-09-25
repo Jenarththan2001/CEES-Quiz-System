@@ -37,6 +37,8 @@ A complete buzzer + scoring solution:
 3. **Windows app** parses serial, starts/stops timer, stores answers, and maintains live leaderboard.
 4. At the end, scores are pushed to the **Podium**: a clean, full-screen web page (Chart.js bar chart + ranking table).
 
+👉 If you want the Windows Forms source code, go to: https://github.com/Jenarththan2001/ArduinoMegaControlCenter
+
 ---
 
 ## 🔌 Hardware (Embedded)
