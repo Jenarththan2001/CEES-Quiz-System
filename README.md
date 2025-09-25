@@ -2,9 +2,9 @@
 
 **SCIENCE AND TECHNOLOGY – QUIZ COMPETITION 2025**
 
-<div align="center">
-  <b>*Civil and Environmental Engineering Society, University of Jaffna*</b>
-</div>
+
+*Civil and Environmental Engineering Society, University of Jaffna*
+
 A complete buzzer + scoring solution:
 
 * ⚡ **Arduino Mega** hardware that captures button presses, locks the first team, and controls team LEDs.
