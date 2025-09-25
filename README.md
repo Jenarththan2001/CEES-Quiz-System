@@ -11,7 +11,7 @@ A complete buzzer + scoring solution:
 
 ---
 
-## 🚀 Demo / Screenshots
+## 📸 Final Quiz Captures
 
 <div align="center">
   <img src="assets/1.jpg" width="700" style="margin:10px;"/>
